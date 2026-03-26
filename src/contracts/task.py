@@ -8,7 +8,7 @@ from typing import Protocol, runtime_checkable, Any
 class Task(Protocol):
     """Контракт, описывающий задачи"""
     id: int
-    payload: str
+    _payload: dict[str, Any]
 
     @staticmethod
     def make_task_from_dict(data: dict[str, Any]) -> Task:

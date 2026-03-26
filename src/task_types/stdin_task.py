@@ -1,5 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from typing import Any
 
 from src.error_types import TaskError
 
@@ -8,8 +9,8 @@ from src.error_types import TaskError
 class StdinTask:
     """Класс задачи, получаемой по вводу"""
     id: int
-    payload: str
-    attrs = ["payload"]
+    _payload: dict[str, Any]
+    attrs = ["deadline"]
 
     @classmethod
     def make_task_from_dict(cls, data: dict[str, str | int]) -> StdinTask:
@@ -26,9 +27,9 @@ class StdinTask:
             raise TaskError(f'Task id is invalid: {data}')
         if task_id < 0:
             raise TaskError(f'Task id is invalid: {data}')
-        attrs = []
+        payload = dict()
         for key in cls.attrs:
             if key not in data:
                 raise TaskError(f'Task {key} is missing: {data}')
-            attrs.append(str(data[key]))
-        return StdinTask(task_id, *attrs)
+            payload[key] = str(data[key])
+        return StdinTask(task_id, payload)

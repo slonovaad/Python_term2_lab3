@@ -62,9 +62,9 @@ class GeneratorSourceTests(unittest.TestCase):
             task1 = source.get_task()
             task2 = source.get_task()
             self.assertEqual(task1.id, 0)
-            self.assertEqual(task1.payload, PAYLOAD_VARIATIONS[0])
+            self.assertEqual(task1._payload, PAYLOAD_VARIATIONS[0])
             self.assertEqual(task2.id, 1)
-            self.assertEqual(task2.payload, PAYLOAD_VARIATIONS[1])
+            self.assertEqual(task2._payload, PAYLOAD_VARIATIONS[1])
 
     def test_get_all_tasks_not_empty(self):
         with (patch('src.sources.generator_source.choice') as mock_choice,
@@ -74,9 +74,9 @@ class GeneratorSourceTests(unittest.TestCase):
             mock_randint.side_effect = [2]
             tasks = source.get_all_tasks()
             self.assertEqual(tasks[0].id, 0)
-            self.assertEqual(tasks[0].payload, PAYLOAD_VARIATIONS[0])
+            self.assertEqual(tasks[0]._payload, PAYLOAD_VARIATIONS[0])
             self.assertEqual(tasks[1].id, 1)
-            self.assertEqual(tasks[1].payload, PAYLOAD_VARIATIONS[1])
+            self.assertEqual(tasks[1]._payload, PAYLOAD_VARIATIONS[1])
 
     def test_get_all_tasks_empty(self):
         with (patch('src.sources.generator_source.randint') as mock_randint):

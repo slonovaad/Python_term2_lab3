@@ -33,11 +33,11 @@ class StdinSourceTests(unittest.TestCase):
             task1 = source.get_task()
             self.assertEqual(task1.id, 0)
             for key in StdinTask.attrs:
-                self.assertEqual(getattr(task1, key), f'test_{key}')
+                self.assertEqual(task1._payload[key], f'test_{key}')
             task2 = source.get_task()
             self.assertEqual(task2.id, 1)
             for key in StdinTask.attrs:
-                self.assertEqual(getattr(task2, key), f'test2_{key}')
+                self.assertEqual(task2._payload[key], f'test2_{key}')
 
     def test_get_all_tasks_correct_no_empty(self):
         with patch('src.sources.stdin_source.input') as mock_input:
@@ -47,10 +47,10 @@ class StdinSourceTests(unittest.TestCase):
             tasks = source.get_all_tasks()
             self.assertEqual(tasks[0].id, 0)
             for key in StdinTask.attrs:
-                self.assertEqual(getattr(tasks[0], key), f'test_{key}')
+                self.assertEqual(tasks[0]._payload[key], f'test_{key}')
             self.assertEqual(tasks[1].id, 1)
             for key in StdinTask.attrs:
-                self.assertEqual(getattr(tasks[1], key), f'test2_{key}')
+                self.assertEqual(tasks[1]._payload[key], f'test2_{key}')
 
     def test_get_all_tasks_correct_empty(self):
         with patch('src.sources.stdin_source.input') as mock_input:

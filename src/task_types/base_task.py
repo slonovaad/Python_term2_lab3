@@ -1,5 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
+from typing import Any
+import json
 
 from src.error_types import TaskError
 
@@ -7,8 +9,9 @@ from src.error_types import TaskError
 @dataclass(frozen=True, slots=True)
 class BaseTask:
     """Класс обычной задачи"""
+
     id: int
-    payload: str
+    _payload: dict[str, Any]
 
     @staticmethod
     def make_task_from_dict(data: dict[str, str | int]) -> BaseTask:
@@ -27,4 +30,10 @@ class BaseTask:
             raise TaskError(f'Task id is invalid: {data}')
         if task_id < 0:
             raise TaskError(f'Task id is invalid: {data}')
-        return BaseTask(task_id, str(data['payload']))
+        payload = data['payload']
+        if not isinstance(payload, dict):
+            try:
+                payload = json.loads(payload)
+            except json.decoder.JSONDecodeError:
+                raise TaskError(f'Task payload is invalid: {payload}')
+        return BaseTask(task_id, payload)
