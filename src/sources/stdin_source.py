@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Any
 
 from src.task_types.stdin_task import StdinTask
 from src.contracts.task import Task
@@ -26,7 +27,7 @@ class StdinSource:
         """Метод, получающий следующую задачу из источника
         :return: задача или None, если источник пуст"""
         print("Task info:")
-        data: dict[str, int | str] = dict()
+        data: dict[str, Any] = dict()
         for key in self.task_class.attrs:
             value = input(f"{key}: ")
             data[key] = value
@@ -47,7 +48,7 @@ class StdinSource:
         all_tasks: list[Task] = []
         for i in range(n):
             print(f"Task {i + 1} info:")
-            data: dict[str, str | int] = dict()
+            data: dict[str, Any] = dict()
             for key in self.task_class.attrs:
                 value = input(f"{key}: ")
                 data[key] = value

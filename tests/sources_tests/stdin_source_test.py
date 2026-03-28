@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime
 from unittest.mock import patch
 from src.contracts.task_source import TaskSource
 from src.sources.stdin_source import StdinSource
@@ -26,31 +27,35 @@ class StdinSourceTests(unittest.TestCase):
             self.assertEqual(source.name, 'name')
 
     def test_get_task(self):
-        with patch('src.sources.stdin_source.input') as mock_input:
+        with (patch('src.sources.stdin_source.input') as mock_input,
+              patch('src.sources.stdin_source.print') as _):
             source = StdinSource('name')
-            mock_input.side_effect = [f'test_{el}' for el in StdinTask.attrs] + [f'test2_{el}' for el in
-                                                                                 StdinTask.attrs]
+            mock_input.side_effect = ['1', '2027-01-02', '2', '2027-02-02']
             task1 = source.get_task()
-            self.assertEqual(task1.id, 0)
-            for key in StdinTask.attrs:
-                self.assertEqual(task1._payload[key], f'test_{key}')
             task2 = source.get_task()
+            self.assertEqual(task1.id, 0)
+            self.assertEqual(task1.payload, {'deadline': datetime(2027, 1, 2), 'priority': 1})
+            self.assertEqual(task1.priority, 1)
+            self.assertEqual(task1.deadline, datetime(2027, 1, 2))
             self.assertEqual(task2.id, 1)
-            for key in StdinTask.attrs:
-                self.assertEqual(task2._payload[key], f'test2_{key}')
+            self.assertEqual(task2.payload, {'deadline': datetime(2027, 2, 2), 'priority': 2})
+            self.assertEqual(task2.priority, 2)
+            self.assertEqual(task2.deadline, datetime(2027, 2, 2))
 
     def test_get_all_tasks_correct_no_empty(self):
-        with patch('src.sources.stdin_source.input') as mock_input:
+        with (patch('src.sources.stdin_source.input') as mock_input,
+              patch('src.sources.stdin_source.print') as _):
             source = StdinSource('name')
-            mock_input.side_effect = ['2'] + [f'test_{el}' for el in StdinTask.attrs] + [f'test2_{el}' for el in
-                                                                                         StdinTask.attrs]
+            mock_input.side_effect = ['2', '1', '2027-01-02', '2', '2027-02-02']
             tasks = source.get_all_tasks()
             self.assertEqual(tasks[0].id, 0)
-            for key in StdinTask.attrs:
-                self.assertEqual(tasks[0]._payload[key], f'test_{key}')
+            self.assertEqual(tasks[0].payload, {'deadline': datetime(2027, 1, 2), 'priority': 1})
+            self.assertEqual(tasks[0].priority, 1)
+            self.assertEqual(tasks[0].deadline, datetime(2027, 1, 2))
             self.assertEqual(tasks[1].id, 1)
-            for key in StdinTask.attrs:
-                self.assertEqual(tasks[1]._payload[key], f'test2_{key}')
+            self.assertEqual(tasks[1].payload, {'deadline': datetime(2027, 2, 2), 'priority': 2})
+            self.assertEqual(tasks[1].priority, 2)
+            self.assertEqual(tasks[1].deadline, datetime(2027, 2, 2))
 
     def test_get_all_tasks_correct_empty(self):
         with patch('src.sources.stdin_source.input') as mock_input:

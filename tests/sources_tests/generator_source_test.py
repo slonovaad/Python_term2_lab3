@@ -1,6 +1,8 @@
 import unittest
 from unittest.mock import patch
+from datetime import datetime
 from src.constants.source_constants import PAYLOAD_VARIATIONS
+from src.constants.task_constants import DATETIME_FORMAT
 from src.contracts.task_source import TaskSource
 from src.sources.generator_source import GeneratorSource
 from src.task_types.base_task import BaseTask
@@ -62,9 +64,15 @@ class GeneratorSourceTests(unittest.TestCase):
             task1 = source.get_task()
             task2 = source.get_task()
             self.assertEqual(task1.id, 0)
-            self.assertEqual(task1._payload, PAYLOAD_VARIATIONS[0])
+            new_payload = PAYLOAD_VARIATIONS[0].copy()
+            new_payload['deadline'] = datetime.strptime(new_payload['deadline'], DATETIME_FORMAT)
+            new_payload['priority'] = int(new_payload['priority'])
+            self.assertEqual(task1.payload, new_payload)
             self.assertEqual(task2.id, 1)
-            self.assertEqual(task2._payload, PAYLOAD_VARIATIONS[1])
+            new_payload = PAYLOAD_VARIATIONS[1].copy()
+            new_payload['deadline'] = datetime.strptime(new_payload['deadline'], DATETIME_FORMAT)
+            new_payload['priority'] = int(new_payload['priority'])
+            self.assertEqual(task2.payload, new_payload)
 
     def test_get_all_tasks_not_empty(self):
         with (patch('src.sources.generator_source.choice') as mock_choice,
@@ -74,9 +82,15 @@ class GeneratorSourceTests(unittest.TestCase):
             mock_randint.side_effect = [2]
             tasks = source.get_all_tasks()
             self.assertEqual(tasks[0].id, 0)
-            self.assertEqual(tasks[0]._payload, PAYLOAD_VARIATIONS[0])
+            new_payload = PAYLOAD_VARIATIONS[0].copy()
+            new_payload['deadline'] = datetime.strptime(new_payload['deadline'], DATETIME_FORMAT)
+            new_payload['priority'] = int(new_payload['priority'])
+            self.assertEqual(tasks[0].payload, new_payload)
             self.assertEqual(tasks[1].id, 1)
-            self.assertEqual(tasks[1]._payload, PAYLOAD_VARIATIONS[1])
+            new_payload = PAYLOAD_VARIATIONS[1].copy()
+            new_payload['deadline'] = datetime.strptime(new_payload['deadline'], DATETIME_FORMAT)
+            new_payload['priority'] = int(new_payload['priority'])
+            self.assertEqual(tasks[1].payload, new_payload)
 
     def test_get_all_tasks_empty(self):
         with (patch('src.sources.generator_source.randint') as mock_randint):

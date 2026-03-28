@@ -11,4 +11,4 @@ dependencies = [
 source = ["src"]
 
 [tool.coverage.report]
-omit = ["tests/*", "src/log_and_print.py", "src/error_types.py", "src/constants/main_constants.py"]
+omit = ["tests/*", "src/log_and_print.py", "src/error_types.py", "src/constants/*", "src/contracts/*"]

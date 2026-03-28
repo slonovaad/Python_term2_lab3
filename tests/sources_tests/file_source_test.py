@@ -2,7 +2,7 @@ import unittest
 from unittest.mock import patch, call, ANY
 import os
 import json
-
+from datetime import datetime
 from src.constants.source_constants import SOURCE_FOLDER
 from src.contracts.task_source import TaskSource
 from src.sources.file_source import FileSource
@@ -102,16 +102,20 @@ class FileSourceTests(unittest.TestCase):
             filename = os.path.join(SOURCE_FOLDER, 'filename.txt')
             source = FileSource('name', filename)
             mock_isfile.side_effect = [True, True]
-            mock_load.side_effect = [[{'payload': {"deadline" : "01.01.27"}},
-                                      {'payload': {"deadline" : "01.02.27"}}],
-                                     [{'payload': {"deadline" : "01.02.27"}}]
+            mock_load.side_effect = [[{'payload': {"deadline": "2032-01-01", "priority": "1"}},
+                                      {'payload': {"deadline": "2032-02-01", "priority": "2"}}],
+                                     [{'payload': {"deadline": "2032-02-01", "priority": "2"}}]
                                      ]
             task1 = source.get_task()
             task2 = source.get_task()
             self.assertEqual(task1.id, 0)
-            self.assertEqual(task1._payload, {"deadline" : "01.01.27"})
+            self.assertEqual(task1.payload, {"deadline": datetime(2032, 1, 1), "priority": 1})
+            self.assertEqual(task1.deadline, datetime(2032, 1, 1))
+            self.assertEqual(task1.priority, 1)
             self.assertEqual(task2.id, 1)
-            self.assertEqual(task2._payload, {"deadline" : "01.02.27"})
+            self.assertEqual(task2.payload, {"deadline": datetime(2032, 2, 1), "priority": 2})
+            self.assertEqual(task2.deadline, datetime(2032, 2, 1))
+            self.assertEqual(task2.priority, 2)
             self.assertEqual(mock_open.call_args_list, [
                 call(filename, 'r'),
                 call(filename, 'w'),
@@ -119,7 +123,7 @@ class FileSourceTests(unittest.TestCase):
                 call(filename, 'w'),
             ])
             self.assertEqual(mock_dump.call_args_list, [
-                call([{'payload': {"deadline" : "01.02.27"}}], ANY),
+                call([{'payload': {"deadline": "2032-02-01", "priority": "2"}}], ANY),
                 call([], ANY),
             ])
             self.assertEqual(len(mock_load.call_args_list), 2)
@@ -195,13 +199,17 @@ class FileSourceTests(unittest.TestCase):
             filename = os.path.join(SOURCE_FOLDER, 'filename.txt')
             source = FileSource('name', filename)
             mock_isfile.side_effect = [True, True]
-            mock_load.side_effect = [[{'payload': '{"deadline" : "01.01.27"}'},
-                                      {'payload': '{"deadline" : "01.02.27"}'}], ]
+            mock_load.side_effect = [[{'payload': {"deadline": "2032-01-01", "priority": "1"}},
+                                      {'payload': {"deadline": "2032-02-01", "priority": "2"}}], ]
             tasks = source.get_all_tasks()
             self.assertEqual(tasks[0].id, 0)
-            self.assertEqual(tasks[0]._payload, {"deadline" : "01.01.27"})
+            self.assertEqual(tasks[0].payload, {"deadline": datetime(2032, 1, 1), "priority": 1})
+            self.assertEqual(tasks[0].deadline, datetime(2032, 1, 1))
+            self.assertEqual(tasks[0].priority, 1)
             self.assertEqual(tasks[1].id, 1)
-            self.assertEqual(tasks[1]._payload, {"deadline" : "01.02.27"})
+            self.assertEqual(tasks[1].payload, {"deadline": datetime(2032, 2, 1), "priority": 2})
+            self.assertEqual(tasks[1].deadline, datetime(2032, 2, 1))
+            self.assertEqual(tasks[1].priority, 2)
             self.assertEqual(mock_open.call_args_list, [
                 call(filename, 'r'),
                 call(filename, 'w'),

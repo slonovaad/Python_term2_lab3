@@ -71,7 +71,7 @@ class MainTests(unittest.TestCase):
     def test_get_task_correct(self):
         mock_source = MagicMock()
         mock_source.name = 'name'
-        mock_source.get_task.return_value = BaseTask(0, 'payload')
+        mock_source.get_task.return_value = BaseTask(0, {'deadline': '2027-01-01', 'priority': '1'})
         mock_source_class = MagicMock()
         mock_source_class.make_source_by_stdin.return_value = mock_source
         with (patch.dict('src.main.SOURCE_TYPES', {'file': mock_source_class}),
@@ -154,7 +154,8 @@ class MainTests(unittest.TestCase):
     def test_get_all_tasks_correct(self):
         mock_source = MagicMock()
         mock_source.name = 'name'
-        mock_source.get_all_tasks.return_value = [BaseTask(0, 'payload1'), BaseTask(1, 'payload2')]
+        mock_source.get_all_tasks.return_value = [BaseTask(0, {'deadline': '2027-01-01', 'priority': '1'}),
+                                                  BaseTask(1, {'deadline': '2027-01-01', 'priority': '2'})]
         mock_source_class = MagicMock()
         mock_source_class.make_source_by_stdin.return_value = mock_source
         with (patch.dict('src.main.SOURCE_TYPES', {'file': mock_source_class}),

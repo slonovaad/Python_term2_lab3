@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from random import choice, randint
+from typing import Any
 
 from src.task_types.base_task import BaseTask
 from src.contracts.task import Task
@@ -44,7 +45,7 @@ class GeneratorSource:
     def get_task(self) -> Task:
         """Метод, получающий следующую задачу из источника
         :return: задача"""
-        data: dict[str, str | int] = {'id': self.task_count,
+        data: dict[str, Any] = {'id': self.task_count,
                                       'payload': choice(PAYLOAD_VARIATIONS[:self.payload_vars_number])}
         task = self.task_class.make_task_from_dict(data)
         self.task_count += 1
