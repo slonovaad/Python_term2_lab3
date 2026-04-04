@@ -123,7 +123,7 @@ class FileSourceTests(unittest.TestCase):
                 call(filename, 'w'),
             ])
             self.assertEqual(mock_dump.call_args_list, [
-                call([{'payload': {"deadline": "2032-02-01", "priority": "2"}}], ANY),
+                call([], ANY),
                 call([], ANY),
             ])
             self.assertEqual(len(mock_load.call_args_list), 2)

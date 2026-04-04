@@ -23,9 +23,9 @@ class StdinSource:
         name = input("Enter source name: ")
         return StdinSource(name)
 
-    def get_task(self) -> Task | None:
+    def get_task(self) -> Task:
         """Метод, получающий следующую задачу из источника
-        :return: задача или None, если источник пуст"""
+        :return: задача"""
         print("Task info:")
         data: dict[str, Any] = dict()
         for key in self.task_class.attrs:
@@ -45,17 +45,9 @@ class StdinSource:
             raise SourceError('Source data is invalid')
         if n < 0:
             raise SourceError('Source data is invalid')
-        all_tasks: list[Task] = []
+        all_tasks = []
         for i in range(n):
-            print(f"Task {i + 1} info:")
-            data: dict[str, Any] = dict()
-            for key in self.task_class.attrs:
-                value = input(f"{key}: ")
-                data[key] = value
-            data['id'] = self.task_count
-            task = self.task_class.make_task_from_dict(data)
-            self.task_count += 1
-            all_tasks.append(task)
+            all_tasks.append(self.get_task())
         if len(all_tasks) == 0:
             return None
         return all_tasks
