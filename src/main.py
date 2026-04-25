@@ -3,7 +3,9 @@ from src.constants.main_constants import SOURCE_TYPES
 from src.constants.source_constants import LOG_FILE
 from src.contracts.task_source import TaskSource
 from src.log_and_print import log_and_print
-from src.error_types import SourceError, TaskError
+from src.error_types import SourceError, TaskError, TaskQueueError
+from src.collections.task_queue import TaskQueue
+from src.sources.source_task_counter import SourceTaskCounter
 
 
 def check_source_name_exists(source_name: str, all_sources: dict[str, TaskSource], need_log_if_not: bool = False,
@@ -32,6 +34,8 @@ def main() -> None:
                         format="[%(asctime)s] %(levelname)s: %(message)s",
                         datefmt="%Y-%m-%d %H:%M:%S")
     all_sources: dict[str, TaskSource] = {}
+    task_queue = TaskQueue()
+    task_counter = SourceTaskCounter()
     try:
         print(f"Sources: {list(all_sources.keys())}")
         while (command := input("Enter command: ")) != "exit":
@@ -48,13 +52,14 @@ def main() -> None:
                         log_and_print(f"Source type '{source_type}' is not supported", logging.ERROR)
                         continue
                     try:
-                        source = source_type.make_source_by_stdin()
+                        source = source_type.make_source_by_stdin(task_counter)
                     except SourceError as e:
                         log_and_print(str(e), logging.ERROR)
                         continue
                     if check_source_name_exists(source.name, all_sources, need_log=True):
                         continue
                     all_sources[source.name] = source
+                    task_queue.add_source(source)
                 case "get_task":
                     source_name = input("Enter source name: ")
                     if not (check_source_name_exists(source_name, all_sources, need_log_if_not=True)):
@@ -68,19 +73,31 @@ def main() -> None:
                     except (SourceError, TaskError) as e:
                         log_and_print(str(e), logging.ERROR)
                         continue
-                case "get_all_tasks":
+                case "get_many_tasks":
                     source_name = input("Enter source name: ")
                     if not (check_source_name_exists(source_name, all_sources, need_log_if_not=True)):
                         continue
                     try:
-                        tasks = all_sources[source_name].get_all_tasks()
+                        tasks = all_sources[source_name].get_many_tasks()
                         if tasks is None:
                             print("No tasks")
                         else:
-                            print(tasks)
+                            print(*tasks, sep='\n')
                     except (SourceError, TaskError) as e:
                         log_and_print(str(e), logging.ERROR)
                         continue
+                case "task_queue":
+                    task_queue.print_all()
+                case "filter_by_status":
+                    try:
+                        task_queue.print_filter_by_status()
+                    except TaskQueueError as e:
+                        log_and_print(str(e), logging.ERROR)
+                case "filter_by_priority":
+                    try:
+                        task_queue.print_filter_by_priority()
+                    except TaskQueueError as e:
+                        log_and_print(str(e), logging.ERROR)
                 case _:
                     log_and_print(f"Unknown command: {command}", logging.ERROR)
             print(f"Sources: {list(all_sources.keys())}")

@@ -104,21 +104,21 @@ class MainTests(unittest.TestCase):
                                                         call('get_task'),
                                                         call('exit')])
 
-    def test_get_all_tasks_source_not_exist(self):
+    def test_get_many_tasks_source_not_exist(self):
         with (patch('src.main.input') as mock_input,
               patch('src.main.print') as _,
               patch('src.main.log_and_print') as mock_log_and_print,
               patch('src.main.logging.info') as mock_info):
-            mock_input.side_effect = ['get_all_tasks', 'name', 'exit']
+            mock_input.side_effect = ['get_many_tasks', 'name', 'exit']
             main()
             mock_log_and_print.assert_called_once_with("Source 'name' does not exist", logging.ERROR)
-            self.assertEqual(mock_info.call_args_list, [call('get_all_tasks'),
+            self.assertEqual(mock_info.call_args_list, [call('get_many_tasks'),
                                                         call('exit')])
 
-    def test_get_all_tasks_source_error(self):
+    def test_get_many_tasks_source_error(self):
         mock_source = MagicMock()
         mock_source.name = 'name'
-        mock_source.get_all_tasks.side_effect = SourceError
+        mock_source.get_many_tasks.side_effect = SourceError
         mock_source_class = MagicMock()
         mock_source_class.make_source_by_stdin.return_value = mock_source
         with (patch.dict('src.main.SOURCE_TYPES', {'file': mock_source_class}),
@@ -126,17 +126,17 @@ class MainTests(unittest.TestCase):
               patch('src.main.print') as _,
               patch('src.main.log_and_print') as mock_log_and_print,
               patch('src.main.logging.info') as mock_info):
-            mock_input.side_effect = ['make_source', 'file', 'get_all_tasks', 'name', 'exit']
+            mock_input.side_effect = ['make_source', 'file', 'get_many_tasks', 'name', 'exit']
             main()
             mock_log_and_print.assert_called_once_with(ANY, logging.ERROR)
             self.assertEqual(mock_info.call_args_list, [call('make_source'),
-                                                        call('get_all_tasks'),
+                                                        call('get_many_tasks'),
                                                         call('exit')])
 
-    def test_get_all_tasks_task_error(self):
+    def test_get_many_tasks_task_error(self):
         mock_source = MagicMock()
         mock_source.name = 'name'
-        mock_source.get_all_tasks.side_effect = TaskError
+        mock_source.get_many_tasks.side_effect = TaskError
         mock_source_class = MagicMock()
         mock_source_class.make_source_by_stdin.return_value = mock_source
         with (patch.dict('src.main.SOURCE_TYPES', {'file': mock_source_class}),
@@ -144,17 +144,17 @@ class MainTests(unittest.TestCase):
               patch('src.main.print') as _,
               patch('src.main.log_and_print') as mock_log_and_print,
               patch('src.main.logging.info') as mock_info):
-            mock_input.side_effect = ['make_source', 'file', 'get_all_tasks', 'name', 'exit']
+            mock_input.side_effect = ['make_source', 'file', 'get_many_tasks', 'name', 'exit']
             main()
             mock_log_and_print.assert_called_once_with(ANY, logging.ERROR)
             self.assertEqual(mock_info.call_args_list, [call('make_source'),
-                                                        call('get_all_tasks'),
+                                                        call('get_many_tasks'),
                                                         call('exit')])
 
-    def test_get_all_tasks_correct(self):
+    def test_get_many_tasks_correct(self):
         mock_source = MagicMock()
         mock_source.name = 'name'
-        mock_source.get_all_tasks.return_value = [BaseTask(0, {'deadline': '2027-01-01', 'priority': '1'}),
+        mock_source.get_many_tasks.return_value = [BaseTask(0, {'deadline': '2027-01-01', 'priority': '1'}),
                                                   BaseTask(1, {'deadline': '2027-01-01', 'priority': '2'})]
         mock_source_class = MagicMock()
         mock_source_class.make_source_by_stdin.return_value = mock_source
@@ -163,17 +163,17 @@ class MainTests(unittest.TestCase):
               patch('src.main.print') as _,
               patch('src.main.log_and_print') as mock_log_and_print,
               patch('src.main.logging.info') as mock_info):
-            mock_input.side_effect = ['make_source', 'file', 'get_all_tasks', 'name', 'exit']
+            mock_input.side_effect = ['make_source', 'file', 'get_many_tasks', 'name', 'exit']
             main()
             mock_log_and_print.assert_not_called()
             self.assertEqual(mock_info.call_args_list, [call('make_source'),
-                                                        call('get_all_tasks'),
+                                                        call('get_many_tasks'),
                                                         call('exit')])
 
-    def test_get_all_tasks_correct_empty(self):
+    def test_get_many_tasks_correct_empty(self):
         mock_source = MagicMock()
         mock_source.name = 'name'
-        mock_source.get_all_tasks.return_value = None
+        mock_source.get_many_tasks.return_value = None
         mock_source_class = MagicMock()
         mock_source_class.make_source_by_stdin.return_value = mock_source
         with (patch.dict('src.main.SOURCE_TYPES', {'file': mock_source_class}),
@@ -181,9 +181,9 @@ class MainTests(unittest.TestCase):
               patch('src.main.print') as _,
               patch('src.main.log_and_print') as mock_log_and_print,
               patch('src.main.logging.info') as mock_info):
-            mock_input.side_effect = ['make_source', 'file', 'get_all_tasks', 'name', 'exit']
+            mock_input.side_effect = ['make_source', 'file', 'get_many_tasks', 'name', 'exit']
             main()
             mock_log_and_print.assert_not_called()
             self.assertEqual(mock_info.call_args_list, [call('make_source'),
-                                                        call('get_all_tasks'),
+                                                        call('get_many_tasks'),
                                                         call('exit')])

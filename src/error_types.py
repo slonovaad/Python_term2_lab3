@@ -6,3 +6,8 @@ class TaskError(Exception):
 class SourceError(Exception):
     """Класс ошибки источника"""
     ...
+
+
+class TaskQueueError(Exception):
+    """Класс ошибки очереди задач"""
+    ...

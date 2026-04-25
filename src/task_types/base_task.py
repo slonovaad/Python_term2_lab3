@@ -123,4 +123,4 @@ class BaseTask(Task):
             deadline_str = self.deadline.strftime(DATETIME_FORMAT)
         return f'id: {self.id}, creation time: {self.creation_time.strftime(DATETIME_FORMAT)}, deadline: {
         deadline_str}, status: {self.status}, priority: {
-        self.priority}, is in time" {self.is_in_time}'
+        self.priority}, is in time: {self.is_in_time}'
