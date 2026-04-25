@@ -87,7 +87,7 @@ def main() -> None:
                         log_and_print(str(e), logging.ERROR)
                         continue
                 case "task_queue":
-                    task_queue.print_all()
+                    task_queue.print_all_by_param()
                 case "filter_by_status":
                     try:
                         task_queue.print_filter_by_status()
@@ -96,6 +96,11 @@ def main() -> None:
                 case "filter_by_priority":
                     try:
                         task_queue.print_filter_by_priority()
+                    except TaskQueueError as e:
+                        log_and_print(str(e), logging.ERROR)
+                case "filter_by_is_in_time":
+                    try:
+                        task_queue.print_filter_by_is_in_time()
                     except TaskQueueError as e:
                         log_and_print(str(e), logging.ERROR)
                 case _:

@@ -10,16 +10,16 @@ from src.error_types import TaskQueueError
 class TaskQueueTests(unittest.TestCase):
     """Тесты класса очереди задач"""
 
-    def test_print_all_one_source_empty(self):
+    def test_print_all_by_param_one_source_empty(self):
         with patch('src.collections.task_queue.print') as mock_print:
             task_queue = TaskQueue()
             task_counter = SourceTaskCounter()
             source = GeneratorSource(task_counter, 'name', 3, 5)
             task_queue.add_source(source)
-            task_queue.print_all()
+            task_queue.print_all_by_param()
             self.assertEqual(mock_print.call_args_list, [call("No tasks found")])
 
-    def test_print_all_one_source_not_empty(self):
+    def test_print_all_by_param_one_source_not_empty(self):
         with patch('src.collections.task_queue.print') as mock_print:
             task_queue = TaskQueue()
             task_counter = SourceTaskCounter()
@@ -27,10 +27,10 @@ class TaskQueueTests(unittest.TestCase):
             task_queue.add_source(source)
             task1 = source.get_task()
             task2 = source.get_task()
-            task_queue.print_all()
+            task_queue.print_all_by_param()
             self.assertEqual(mock_print.call_args_list, [call(task1), call(task2)])
 
-    def test_print_all_many_source_empty(self):
+    def test_print_all_by_param_many_source_empty(self):
         with patch('src.collections.task_queue.print') as mock_print:
             task_queue = TaskQueue()
             task_counter = SourceTaskCounter()
@@ -38,10 +38,10 @@ class TaskQueueTests(unittest.TestCase):
             source2 = GeneratorSource(task_counter, 'name2', 3, 5)
             task_queue.add_source(source1)
             task_queue.add_source(source2)
-            task_queue.print_all()
+            task_queue.print_all_by_param()
             self.assertEqual(mock_print.call_args_list, [call("No tasks found")])
 
-    def test_print_all_many_source_first_empty(self):
+    def test_print_all_by_param_many_source_first_empty(self):
         with patch('src.collections.task_queue.print') as mock_print:
             task_queue = TaskQueue()
             task_counter = SourceTaskCounter()
@@ -51,10 +51,10 @@ class TaskQueueTests(unittest.TestCase):
             task_queue.add_source(source2)
             task1 = source2.get_task()
             task2 = source2.get_task()
-            task_queue.print_all()
+            task_queue.print_all_by_param()
             self.assertEqual(mock_print.call_args_list, [call(task1), call(task2)])
 
-    def test_print_all_many_source_second_empty(self):
+    def test_print_all_by_param_many_source_second_empty(self):
         with patch('src.collections.task_queue.print') as mock_print:
             task_queue = TaskQueue()
             task_counter = SourceTaskCounter()
@@ -64,10 +64,10 @@ class TaskQueueTests(unittest.TestCase):
             task_queue.add_source(source2)
             task1 = source1.get_task()
             task2 = source1.get_task()
-            task_queue.print_all()
+            task_queue.print_all_by_param()
             self.assertEqual(mock_print.call_args_list, [call(task1), call(task2)])
 
-    def test_print_all_many_source(self):
+    def test_print_all_by_param_many_source(self):
         with patch('src.collections.task_queue.print') as mock_print:
             task_queue = TaskQueue()
             task_counter = SourceTaskCounter()
@@ -79,7 +79,7 @@ class TaskQueueTests(unittest.TestCase):
             task2 = source2.get_task()
             task3 = source2.get_task()
             task4 = source1.get_task()
-            task_queue.print_all()
+            task_queue.print_all_by_param()
             self.assertEqual(mock_print.call_args_list, [call(task1), call(task4), call(task2), call(task3)])
 
     def test_print_filter_by_status_incorrect_status(self):
@@ -231,4 +231,71 @@ class TaskQueueTests(unittest.TestCase):
             source2.get_task()
             source1.get_task()
             task_queue.print_filter_by_priority()
+            self.assertEqual(mock_print.call_args_list, [call("No tasks found")])
+
+
+    def test_print_filter_by_is_in_time_incorrect_is_in_time(self):
+        with (patch('src.collections.task_queue.print') as mock_print,
+              patch('src.collections.task_queue.input') as mock_input):
+            mock_input.side_effect = ["2"]
+            task_queue = TaskQueue()
+            task_counter = SourceTaskCounter()
+            source = GeneratorSource(task_counter, 'name', 3, 5)
+            task_queue.add_source(source)
+            self.assertRaises(TaskQueueError, task_queue.print_filter_by_is_in_time)
+            mock_print.assert_not_called()
+
+    def test_print_filter_by_is_in_time_empty(self):
+        with (patch('src.collections.task_queue.print') as mock_print,
+              patch('src.collections.task_queue.input') as mock_input_task_queue):
+            task_queue = TaskQueue()
+            task_counter = SourceTaskCounter()
+            mock_input_task_queue.side_effect = ['1']
+            source1 = StdinSource(task_counter, 'name1')
+            source2 = StdinSource(task_counter, 'name2')
+            task_queue.add_source(source1)
+            task_queue.add_source(source2)
+            task_queue.print_filter_by_is_in_time()
+            self.assertEqual(mock_print.call_args_list, [call("No tasks found")])
+
+    def test_print_filter_by_is_in_time_not_empty(self):
+        with (patch('src.collections.task_queue.print') as mock_print,
+              patch('src.sources.stdin_source.print') as _,
+              patch('src.collections.task_queue.input') as mock_input_task_queue,
+              patch('src.sources.stdin_source.input') as mock_input_sources):
+            task_queue = TaskQueue()
+            task_counter = SourceTaskCounter()
+            mock_input_task_queue.side_effect = ['1']
+            mock_input_sources.side_effect = ['1', '2027-01-02', '2', '2020-02-02', '1', '2027-02-03', '2',
+                                              '2020-01-04']
+            source1 = StdinSource(task_counter, 'name1')
+            source2 = StdinSource(task_counter, 'name2')
+            task_queue.add_source(source1)
+            task_queue.add_source(source2)
+            task1 = source1.get_task()
+            source2.get_task()
+            task3 = source2.get_task()
+            source1.get_task()
+            task_queue.print_filter_by_is_in_time()
+            self.assertEqual(mock_print.call_args_list, [call(task1), call(task3)])
+
+    def test_print_filter_by_is_in_time_no_matches(self):
+        with (patch('src.collections.task_queue.print') as mock_print,
+              patch('src.sources.stdin_source.print') as _,
+              patch('src.collections.task_queue.input') as mock_input_task_queue,
+              patch('src.sources.stdin_source.input') as mock_input_sources):
+            task_queue = TaskQueue()
+            task_counter = SourceTaskCounter()
+            mock_input_task_queue.side_effect = ['1']
+            mock_input_sources.side_effect = ['1', '2020-01-02', '2', '2020-02-02', '1', '2020-02-03', '2',
+                                              '2020-01-04']
+            source1 = StdinSource(task_counter, 'name1')
+            source2 = StdinSource(task_counter, 'name2')
+            task_queue.add_source(source1)
+            task_queue.add_source(source2)
+            source1.get_task()
+            source2.get_task()
+            source2.get_task()
+            source1.get_task()
+            task_queue.print_filter_by_is_in_time()
             self.assertEqual(mock_print.call_args_list, [call("No tasks found")])
